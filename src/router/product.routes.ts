@@ -1,17 +1,21 @@
 import { Request, Response, Router } from "express";
+import multer from 'multer';
 import {
     getAllProducts,
     getProductsByCategory,
     createProduct,
-    deleteProductById
+    deleteProductById,
+    updateProductById
 } from "../controllers/productController";
+import { upload } from "../config/multerConfig";
 
 const router = Router();
 
 router.get("/products", getAllProducts);
 router.get("/products/category/:category", getProductsByCategory);
-router.post("/products", createProduct);
+router.post("/products", upload.any(), createProduct);
 router.delete("/products/id/:id", deleteProductById);
+router.put("/products/:id", updateProductById);
 
 export { router };
 

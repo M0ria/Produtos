@@ -12,12 +12,12 @@ export const getProductsByCategory = (req: Request, res: Response) => {
     const newList = products.filter((product) => {
         return product.category === category;
     });
-        res.status(200).json(newList);
+    res.status(200).json(newList);
 };
 
 export const createProduct = (req: Request, res: Response) => {
     //CORPO QUE RECEBO COM AS INFORMAÇÕES DO MEU PRODUTO DO CLIENT
-    const { name, description, specifications, image, category } = req.body;
+    const { name, description, specifications, category } = req.body;
     //FORMA OLHANDO PARA A CHAVE DO OBJETO
     const hasInvalidKeys = !name || !description || !category;
     const hasEmptyKeys = name.trim() === "" || description.trim() === "" || category.trim() === "";
@@ -32,7 +32,7 @@ export const createProduct = (req: Request, res: Response) => {
         description,
         category,
         specifications: specifications || {},
-        image: image || "",
+        image: ""
     };
 
     products.push(newProduct);
@@ -58,4 +58,31 @@ export const deleteProductById = (req: Request, res: Response) => {
     const deleteProduct = products.splice(deleteIndex, 1);
 
     res.sendStatus(204)
+};
+
+export const updateProductById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { name, description, specifications, category } = req.body;
+
+    // // Verificar se o produto existe
+    const productIndex = products.findIndex((product) => product.id === Number(id));
+
+    if (productIndex === -1) {
+        res.status(404).send()
+    }
+
+    // // Atualizar o produto com os dados fornecidos
+    const updatedProduct = {
+        ...products[productIndex],
+        name: name || products[productIndex].name, // Mantém o valor anterior se não for fornecido um novo
+        description: description || products[productIndex].description,
+        category: category || products[productIndex].category,
+        specifications: specifications || products[productIndex].specifications,
+
+    };
+
+    // // Substituir o produto antigo pelo atualizado
+    products[productIndex] = updatedProduct;
+
+    res.status(200).json(updatedProduct); // Retorna o produto atualizado
 };
